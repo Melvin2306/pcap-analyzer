@@ -1,5 +1,7 @@
 "use client";
 
+import { Dropzone } from "@/components/Dropzone";
+import { createSubmitHandler, FormValues } from "@/components/PcapUploader";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -10,10 +12,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { createSubmitHandler, FormValues } from "@/components/PcapUploader";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function Home() {
@@ -34,7 +34,7 @@ export default function Home() {
           await onSubmit(values);
         } catch (error) {
           console.error("Error during submission:", error);
-          throw error; // Rethrow to trigger the error toast
+          throw error;
         }
       },
       {
@@ -59,20 +59,11 @@ export default function Home() {
             <FormField
               control={form.control}
               name="file"
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              render={({ field: { onChange, value, ...field } }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>PCAP File</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="file"
-                      accept=".pcap"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        onChange(file);
-                      }}
-                    />
+                    <Dropzone {...field} />
                   </FormControl>
                   <FormDescription>
                     Upload your PCAP file here. Only .pcap files are accepted.

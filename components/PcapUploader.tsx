@@ -55,6 +55,35 @@ export function createSubmitHandler(setFileError: (error: string) => void) {
     console.log(file.size);
     console.log(file.name);
 
-    return { fileError: "" };
+    function getBase64EncodedDate() {
+      const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+      return btoa(today); // Encode the date to base64
+    }
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(`${process.env.BACKEND_URL}pcap-default`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Date-Encoded": getBase64EncodedDate(), // Add the custom header
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Server response was not ok");
+      }
+
+      const result = await response.json();
+      console.log("Processed PCAP data:", result);
+
+      // Handle the result as needed
+      return { fileError: "" };
+    } catch (error) {
+      console.error("Error processing PCAP file:", error);
+      setFileError("Error processing PCAP file.");
+      return { fileError: "Error processing PCAP file." };
+    }
   };
 }

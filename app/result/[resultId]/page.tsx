@@ -3,6 +3,8 @@
 import ResultsTable from "@/components/ResultsTable";
 import { useDataContext } from "@/components/context/DataContext";
 
+export const runtime = "edge";
+
 export default function ResultsPage() {
   const { data } = useDataContext();
 

@@ -1,5 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useDataContext } from "./context/DataContext";
+
 // Define the type for the form values
 export interface FormValues {
   file: File | null;
@@ -10,8 +13,13 @@ export interface SubmitResult {
   fileError: string;
 }
 
-export function createSubmitHandler(setFileError: (error: string) => void) {
-  return async function onSubmit(values: FormValues): Promise<SubmitResult> {
+export function useCreateSubmitHandler(
+  setFileError: React.Dispatch<React.SetStateAction<string>>
+) {
+  const router = useRouter();
+  const { setData } = useDataContext();
+
+  const onSubmit = async (values: FormValues): Promise<SubmitResult> => {
     setFileError("");
     const file = values.file;
 
@@ -63,11 +71,11 @@ export function createSubmitHandler(setFileError: (error: string) => void) {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch(`${process.env.BACKEND_URL}pcap-default`, {
+      const response = await fetch(`http://localhost:8000/pcap-default`, {
         method: "POST",
         body: formData,
         headers: {
-          "X-Date-Encoded": getBase64EncodedDate(), // Add the custom header
+          "X-Date-Encoded": getBase64EncodedDate(),
         },
       });
 
@@ -76,9 +84,14 @@ export function createSubmitHandler(setFileError: (error: string) => void) {
       }
 
       const result = await response.json();
-      console.log("Processed PCAP data:", result);
+      console.log("Processed PCAP data:", result.output_json);
 
-      // Handle the result as needed
+      // Save data to context
+      setData(result.output_json);
+
+      // Redirect to results page
+      router.push(`/result/${result.unique_id}`);
+
       return { fileError: "" };
     } catch (error) {
       console.error("Error processing PCAP file:", error);
@@ -86,4 +99,6 @@ export function createSubmitHandler(setFileError: (error: string) => void) {
       return { fileError: "Error processing PCAP file." };
     }
   };
+
+  return onSubmit;
 }

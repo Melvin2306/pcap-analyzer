@@ -1,7 +1,7 @@
 "use client";
 
 import { Dropzone } from "@/components/Dropzone";
-import { createSubmitHandler, FormValues } from "@/components/PcapUploader";
+import { FormValues, useCreateSubmitHandler } from "@/components/PcapUploader";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,7 +25,7 @@ export default function Home() {
     },
   });
 
-  const onSubmit = createSubmitHandler(setFileError);
+  const onSubmit = useCreateSubmitHandler(setFileError);
 
   const handleSubmit = async (values: FormValues) => {
     toast.promise(
